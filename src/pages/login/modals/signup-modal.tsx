@@ -42,7 +42,7 @@ const SignupModal = () => {
     onSubmit: (values) => {
       setLoading(true);
       apiRequest<{ user: User }>({
-        url: "/auth/signup",
+        url: "/auth/sign-up",
         method: "POST",
         body: values,
       })
