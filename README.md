@@ -1,51 +1,50 @@
-# FriendMap Frontend
+# React + TypeScript + Vite
 
-This is the frontend application for the FriendMap project, built using React, Vite, and TypeScript. The backend repository can be found [here](https://github.com/Youngswadhin/FriendMap.git).
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-FriendMap allows users to visualize the locations of their friends on an interactive map. The application provides features such as user authentication, adding and managing friends, and real-time location updates. This README will guide you through the setup and usage of the frontend application.
+Currently, two official plugins are available:
 
-## Table of Contents
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
+## Expanding the ESLint configuration
 
-## Installation
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-1. Clone the repository:
-  ```sh
-  git clone https://github.com/Youngswadhin/FriendMap-Frontend.git
-  ```
-2. Navigate to the project directory:
-  ```sh
-  cd FriendMap-Frontend
-  ```
-3. Install the dependencies:
-  ```sh
-  npm install
-  ```
+- Configure the top-level `parserOptions` property like this:
 
-## Usage
+```js
+export default tseslint.config({
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
 
-1. Start the development server:
-  ```sh
-  npm run dev
-  ```
-2. Open your browser and navigate to `http://localhost:3000`.
+- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
+- Optionally add `...tseslint.configs.stylisticTypeChecked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
 
-## Features
+```js
+// eslint.config.js
+import react from 'eslint-plugin-react'
 
-- User authentication
-- Interactive map to display friends' locations
-- Add and manage friends
-- Real-time location updates
-
-## Contributing
-
-Contributions are welcome! Please read the [contributing guidelines](CONTRIBUTING.md) first.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+export default tseslint.config({
+  // Set the react version
+  settings: { react: { version: '18.3' } },
+  plugins: {
+    // Add the react plugin
+    react,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended rules
+    ...react.configs.recommended.rules,
+    ...react.configs['jsx-runtime'].rules,
+  },
+})
+```

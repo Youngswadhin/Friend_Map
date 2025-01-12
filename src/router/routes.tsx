@@ -18,7 +18,12 @@ const Layout = () => {
   const [{ jwt }, , removeJwt] = useCookies(["jwt"]);
   const { isAuthenticated, isLoading, user, setUser, setIsAuthenticated } =
     useAuth();
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="w-screen h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   if (!isAuthenticated) return <Outlet />;
   return (
     <div className="main w-[100vw] h-[100vh] relative ]">

@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isError,
     refetch,
   } = useQuery({
-    // enabled: false,
+    enabled: false,
     queryKey: ["user"],
     queryFn: fetchUser,
     onError: (error) => {
@@ -46,14 +46,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log(jwt);
       removeJwt("jwt");
     },
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
-  // useEffect(() => {
-  //   console.log(jwt);
-  //   if (jwt) {
-  //     refetch();
-  //   }
-  // }, [jwt, refetch]);
+  useEffect(() => {
+    refetch();
+  }, []);
 
   useEffect(() => {
     if (fetchedUser) {

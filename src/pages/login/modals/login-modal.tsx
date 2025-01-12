@@ -15,6 +15,7 @@ const LoginModal = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const { setIsAuthenticated, setUser } = useAuth();
   const modalRef = useRef<ModalRef>(null);
+  const [loading, setIsLoading] = useState(false);
 
   const toggleVisibility = () => setIsVisible((prevState) => !prevState);
 
@@ -28,6 +29,7 @@ const LoginModal = () => {
       password: Yup.string().required("Required"),
     }),
     onSubmit: (values) => {
+      setIsLoading(true);
       apiRequest<{ user: User }>({
         url: "/auth/login",
         method: "POST",
@@ -42,6 +44,9 @@ const LoginModal = () => {
         })
         .catch((err) => {
           toast.error(err.message);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     },
   });
@@ -109,13 +114,19 @@ const LoginModal = () => {
           </div>
         </div>
         <Button variant="default" onClick={() => formik.handleSubmit()}>
-          Login
-          <KeyRound
-            className="-me-1 ms-2 opacity-60"
-            size={16}
-            strokeWidth={2}
-            aria-hidden="true"
-          />
+          {loading ? (
+            "Loading..."
+          ) : (
+            <>
+              Login
+              <KeyRound
+                className="-me-1 ms-2 opacity-60"
+                size={16}
+                strokeWidth={2}
+                aria-hidden="true"
+              />
+            </>
+          )}
         </Button>
       </div>
     </Modal>

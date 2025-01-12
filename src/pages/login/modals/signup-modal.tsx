@@ -9,11 +9,12 @@ import apiRequest from "@/utils/api";
 import { User } from "@/types/types";
 import { useAuth } from "@/store/auth-provider";
 import { toast } from "react-toastify";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const SignupModal = () => {
   const { setIsAuthenticated, setUser } = useAuth();
   const modalRef = useRef<ModalRef>(null);
+  const [loading, setLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -39,6 +40,7 @@ const SignupModal = () => {
       password: Yup.string().required("Required"),
     }),
     onSubmit: (values) => {
+      setLoading(true);
       apiRequest<{ user: User }>({
         url: "/auth/signup",
         method: "POST",
@@ -53,6 +55,9 @@ const SignupModal = () => {
         })
         .catch((err) => {
           toast.error(err.message);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     },
   });
@@ -210,13 +215,19 @@ const SignupModal = () => {
           className="mt-2"
           onClick={() => formik.handleSubmit()}
         >
-          Sign up
-          <Plus
-            className="-me-1 ms-2 opacity-60"
-            size={16}
-            strokeWidth={2}
-            aria-hidden="true"
-          />
+          {loading ? (
+            <>Loading...</>
+          ) : (
+            <>
+              Sign up
+              <Plus
+                className="-me-1 ms-2 opacity-60"
+                size={16}
+                strokeWidth={2}
+                aria-hidden="true"
+              />
+            </>
+          )}
         </Button>
       </div>
     </Modal>
