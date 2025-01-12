@@ -1,17 +1,20 @@
-import {
-  AtSign,
-  CircleUser,
-  KeyRound,
-  User,
-  UserRoundPlus,
-} from "lucide-react";
-import Modal from "../../../component/modal/modal";
+import { AtSign, CircleUser, Plus, UserRoundPlus } from "lucide-react";
+import Modal, { ModalRef } from "../../../component/modal/modal";
 import { Button } from "../../../components/ui/button";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import InputField from "../../../component/input-field/input-field";
+import SelectField from "../../../component/select-field/select-field";
+import apiRequest from "@/utils/api";
+import { User } from "@/types/types";
+import { useAuth } from "@/store/auth-provider";
+import { toast } from "react-toastify";
+import { useRef } from "react";
 
 const SignupModal = () => {
+  const { setIsAuthenticated, setUser } = useAuth();
+  const modalRef = useRef<ModalRef>(null);
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -36,14 +39,28 @@ const SignupModal = () => {
       password: Yup.string().required("Required"),
     }),
     onSubmit: (values) => {
-      console.log(values);
+      apiRequest<{ user: User }>({
+        url: "/auth/signup",
+        method: "POST",
+        body: values,
+      })
+        .then((res) => {
+          if (res.status === 200) {
+            setUser(res.data.user);
+            setIsAuthenticated(true);
+            modalRef.current?.close();
+          }
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
     },
   });
 
   return (
     <Modal
+      ref={modalRef}
       heading="Sign Up"
-      open
       trigger={
         <Button variant="outline" size={"lg"}>
           Sign Up
@@ -55,9 +72,9 @@ const SignupModal = () => {
           />
         </Button>
       }
-      className="w-[clamp(300px,600px,80vw)]"
+      className="w-[clamp(300px,600px,90vw)]"
     >
-      <div className="flex-col flex px-4 py-3 gap-4">
+      <div className="flex-col flex md:px-4 py-3 gap-2">
         <div className="flex gap-2 w-full">
           <InputField
             name="email"
@@ -102,110 +119,99 @@ const SignupModal = () => {
             value={formik.values.age}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            preIcon={User}
             flex={1}
           />
         </div>
         <div className="flex gap-2 w-full">
           <InputField
-            name="country"
+            name="address.country"
             title="Enter Country"
             placeholder="Country"
             type="text"
             value={formik.values.address.country}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            preIcon={CircleUser}
             flex={1}
           />
           <InputField
-            name="state"
+            name="address.state"
             title="Enter State"
             placeholder="State"
             type="text"
             value={formik.values.address.state}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            preIcon={User}
             flex={1}
           />
         </div>
         <div className="flex gap-2 w-full">
           <InputField
-            name="city"
+            name="address.city"
             title="Enter City"
             placeholder="City"
             type="text"
             value={formik.values.address.city}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            preIcon={CircleUser}
             flex={1}
           />
           <InputField
-            name="zip"
+            name="address.zip"
             title="Enter Zip"
             placeholder="Zip"
             type="number"
             value={formik.values.address.zip}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            preIcon={User}
             flex={1}
           />
         </div>
         <div className="flex gap-2 w-full">
           <InputField
-            name="lat"
+            name="address.location.lat"
             title="Enter Latitude"
             placeholder="Latitude"
             type="text"
             value={formik.values.address.location.lat}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            preIcon={CircleUser}
             flex={1}
           />
           <InputField
-            name="long"
+            name="address.location.long"
             title="Enter Longitude"
             placeholder="Longitude"
             type="text"
             value={formik.values.address.location.long}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            preIcon={User}
             flex={1}
           />
         </div>
-        <div className="flex gap-2 w-full">
-          <InputField
-            name="lat"
-            title="Enter Latitude"
-            placeholder="Latitude"
-            type="text"
-            value={formik.values.address.location.lat}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            preIcon={CircleUser}
-            flex={1}
-          />
-          <InputField
-            name="long"
-            title="Enter Longitude"
-            placeholder="Longitude"
-            type="text"
-            value={formik.values.address.location.long}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            preIcon={User}
-            flex={1}
-          />
-        </div>
+        <SelectField
+          creatable
+          name="hobbies"
+          title="Enter Hobbies"
+          placeholder="Write & Enter to add"
+          value={formik.values.hobbies}
+          onChange={(data) => formik.setFieldValue("hobbies", data)}
+          options={[
+            { value: "reading", label: "Reading" },
+            { value: "traveling", label: "Traveling" },
+            { value: "cooking", label: "Cooking" },
+            { value: "sports", label: "Sports" },
+            { value: "music", label: "Music" },
+          ]}
+          flex={1}
+        />
 
-        <Button variant="default">
-          Login
-          <KeyRound
+        <Button
+          variant="default"
+          className="mt-2"
+          onClick={() => formik.handleSubmit()}
+        >
+          Sign up
+          <Plus
             className="-me-1 ms-2 opacity-60"
             size={16}
             strokeWidth={2}

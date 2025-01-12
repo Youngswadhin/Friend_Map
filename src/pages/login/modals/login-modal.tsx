@@ -1,14 +1,20 @@
 import { AtSign, Eye, EyeOff, KeyRound, Sparkles } from "lucide-react";
-import Modal from "../../../component/modal/modal";
+import Modal, { ModalRef } from "../../../component/modal/modal";
 import { Button } from "../../../components/ui/button";
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import apiRequest from "@/utils/api";
+import { useAuth } from "@/store/auth-provider";
+import { User } from "@/types/types";
+import { toast } from "react-toastify";
 
 const LoginModal = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const { setIsAuthenticated, setUser } = useAuth();
+  const modalRef = useRef<ModalRef>(null);
 
   const toggleVisibility = () => setIsVisible((prevState) => !prevState);
 
@@ -22,14 +28,28 @@ const LoginModal = () => {
       password: Yup.string().required("Required"),
     }),
     onSubmit: (values) => {
-      console.log(values);
+      apiRequest<{ user: User }>({
+        url: "/auth/login",
+        method: "POST",
+        body: values,
+      })
+        .then((res) => {
+          if (res.status === 200) {
+            setUser(res.data.user);
+            setIsAuthenticated(true);
+            modalRef.current?.close();
+          }
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
     },
   });
 
   return (
     <Modal
+      ref={modalRef}
       heading="Login"
-      open
       trigger={
         <Button variant="outline" size={"lg"}>
           Login
@@ -88,7 +108,7 @@ const LoginModal = () => {
             </button>
           </div>
         </div>
-        <Button variant="default">
+        <Button variant="default" onClick={() => formik.handleSubmit()}>
           Login
           <KeyRound
             className="-me-1 ms-2 opacity-60"

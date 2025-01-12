@@ -1,4 +1,10 @@
-import { createContext, useContext, ReactNode, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import { useQuery } from "react-query";
 import { User } from "../types/types";
 import apiRequest from "../utils/api";
@@ -9,39 +15,64 @@ interface AuthContextType {
   isLoading: boolean;
   isError: boolean;
   isAuthenticated: boolean;
+  setUser: (user: User | null) => void;
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
+  refetch: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const fetchUser = async (): Promise<User> => {
-  const { data } = await apiRequest<User>({ method: "GET", url: "" });
+  const { data } = await apiRequest<User>({ method: "GET", url: "/auth" });
   return data;
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [{ jwt }, , removeJwt] = useCookies(["jwt"]);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
   const {
-    data: user,
+    data: fetchedUser,
     isLoading,
     isError,
     refetch,
   } = useQuery({
-    enabled: false,
+    // enabled: false,
     queryKey: ["user"],
     queryFn: fetchUser,
+    onError: (error) => {
+      console.error(error);
+      console.log(jwt);
+      removeJwt("jwt");
+    },
   });
-  const isAuthenticated = !!user;
 
-  const [{ jwt }] = useCookies(["jwt"]);
+  // useEffect(() => {
+  //   console.log(jwt);
+  //   if (jwt) {
+  //     refetch();
+  //   }
+  // }, [jwt, refetch]);
 
   useEffect(() => {
-    if (jwt) {
-      refetch();
+    if (fetchedUser) {
+      setUser(fetchedUser);
+      setIsAuthenticated(true);
     }
-  }, [jwt, refetch]);
+  }, [fetchedUser]);
 
   return (
     <AuthContext.Provider
-      value={{ user: user || null, isLoading, isError, isAuthenticated }}
+      value={{
+        user,
+        isLoading,
+        isError,
+        isAuthenticated,
+        setUser,
+        setIsAuthenticated,
+        refetch,
+      }}
     >
       {children}
     </AuthContext.Provider>

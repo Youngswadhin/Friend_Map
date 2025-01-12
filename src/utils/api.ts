@@ -2,6 +2,13 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const BASE_API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
+// Add CORS headers to the request
+axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+axios.defaults.headers.common["Access-Control-Allow-Methods"] =
+  "GET, POST, PUT, DELETE, OPTIONS";
+axios.defaults.headers.common["Access-Control-Allow-Headers"] =
+  "Content-Type, Authorization";
+
 interface ApiRequestParams {
   url: string;
   method: "GET" | "POST" | "PUT" | "DELETE";

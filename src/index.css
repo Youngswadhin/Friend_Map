@@ -75,3 +75,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.leaflet-tile-pane {
+  filter: saturate(0.13) brightness(1.1);
+}

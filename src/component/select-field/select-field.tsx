@@ -13,18 +13,20 @@ interface SelectFieldProps {
   errorEnabled?: boolean;
   flex?: number;
   name?: string;
+  creatable?: boolean;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
   value,
   onChange,
-  title = "Select frameworks",
+  title = "",
   className = "",
-  placeholder = "Select frameworks",
+  placeholder = "",
   options,
   error,
   errorEnabled = false,
   flex,
+  creatable = false,
 }) => {
   const id = useId();
 
@@ -32,6 +34,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
     <div className="space-y-2" style={{ flex }}>
       <Label htmlFor={id}>{title}</Label>
       <MultipleSelector
+        creatable={creatable}
         className={className}
         value={value}
         onChange={onChange}
@@ -40,21 +43,6 @@ const SelectField: React.FC<SelectFieldProps> = ({
         emptyIndicator={<p className="text-center text-sm">No results found</p>}
       />
       {errorEnabled && error && <p className="text-red-600 text-sm">{error}</p>}
-      <p
-        className="mt-2 text-xs text-muted-foreground"
-        role="region"
-        aria-live="polite"
-      >
-        Inspired by{" "}
-        <a
-          className="underline hover:text-foreground"
-          href="https://shadcnui-expansions.typeart.cc/docs/multiple-selector"
-          target="_blank"
-          rel="noopener nofollow"
-        >
-          shadcn/ui expansions
-        </a>
-      </p>
     </div>
   );
 };

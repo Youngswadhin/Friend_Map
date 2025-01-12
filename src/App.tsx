@@ -2,6 +2,7 @@ import { QueryClientProvider, QueryClient } from "react-query";
 import AppRoutes from "./router/routes";
 import { AuthProvider } from "./store/auth-provider";
 import { CookiesProvider } from "react-cookie";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const queryClient = new QueryClient();
@@ -11,6 +12,7 @@ function App() {
       <CookiesProvider>
         <AuthProvider>
           <AppRoutes />
+          <ToastContainer />
         </AuthProvider>
       </CookiesProvider>
     </QueryClientProvider>

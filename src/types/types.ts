@@ -22,16 +22,10 @@ export interface Location {
 export interface FriendRequest {
   id: string;
   senderId: string;
+  sender: User;
+  receiver: User;
   receiverId: string;
-  status: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface UserOnUser {
-  id: string;
-  userId: string;
-  friendId: string;
+  status: "PENDING" | "ACCEPTED" | "REJECTED";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,8 +39,8 @@ export interface User {
   address?: Address;
   image?: string;
   hobbies: string[];
-  friends: UserOnUser[];
-  friendOf: UserOnUser[];
+  friends: User[];
+  friendOf: User[];
   sentRequests: FriendRequest[];
   receivedRequests: FriendRequest[];
   createdAt: Date;

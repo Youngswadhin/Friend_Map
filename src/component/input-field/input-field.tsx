@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
-import { AtSign, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { LucideIcon } from "lucide-react";
 
@@ -33,7 +33,7 @@ const InputField: React.FC<InputFieldProps> = ({
   max,
   error,
   errorEnabled = false,
-  preIcon: PreIcon = AtSign,
+  preIcon: PreIcon,
   password = false,
   flex,
   name = "",
@@ -59,7 +59,9 @@ const InputField: React.FC<InputFieldProps> = ({
                 : className + "peer ps-9"
               : password
               ? ""
-              : "peer ps-9"
+              : PreIcon
+              ? "peer ps-9"
+              : ""
           }
           placeholder={placeholder}
           type={password ? (isVisible ? "text" : "password") : type}
@@ -85,9 +87,11 @@ const InputField: React.FC<InputFieldProps> = ({
             )}
           </button>
         ) : (
-          <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
-            <PreIcon size={16} strokeWidth={2} aria-hidden="true" />
-          </div>
+          PreIcon && (
+            <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
+              <PreIcon size={16} strokeWidth={2} aria-hidden="true" />
+            </div>
+          )
         )}
       </div>
       {errorEnabled && error && <p className="text-red-600 text-sm">{error}</p>}
